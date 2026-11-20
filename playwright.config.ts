@@ -20,6 +20,8 @@ export default defineConfig({
     timeout: 240_000,
     reuseExistingServer: !process.env.CI,
     env: {
+      // Always the throwaway in-memory DB, even if .env.local has a real DATABASE_URL.
+      DATABASE_URL: "",
       PGLITE_DIR: "memory://",
       ADMIN_EMAIL: "admin@e2e.test",
       ADMIN_PASSWORD: "e2e-admin-password",
