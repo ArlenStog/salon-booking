@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/fetcher";
 import { keys } from "@/hooks/queries";
-import { Button, Card, ErrorText, Input } from "./ui";
+import { Button, ErrorText, Input } from "./ui";
 
 export function AuthForm({ mode, next }: { mode: "login" | "register"; next: string }) {
   const router = useRouter();
@@ -22,13 +22,14 @@ export function AuthForm({ mode, next }: { mode: "login" | "register"; next: str
   });
 
   return (
-    <Card className="mx-auto max-w-sm">
-      <h1 className="mb-1 text-2xl font-semibold">{isLogin ? "Welcome back" : "Create an account"}</h1>
-      <p className="mb-6 text-sm text-zinc-400">
-        {isLogin ? "Log in to book and manage appointments." : "It takes 20 seconds."}
+    <div className="mx-auto max-w-sm">
+      <p className="eyebrow">{isLogin ? "Account" : "New here"}</p>
+      <h1 className="mt-3 font-display text-4xl">{isLogin ? "Welcome back" : "Create an account"}</h1>
+      <p className="mt-2 text-muted">
+        {isLogin ? "Log in to book and manage your appointments." : "Takes about twenty seconds."}
       </p>
       <form
-        className="space-y-4"
+        className="mt-10 space-y-7"
         onSubmit={(e) => {
           e.preventDefault();
           submit.mutate(Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>);
@@ -49,15 +50,15 @@ export function AuthForm({ mode, next }: { mode: "login" | "register"; next: str
           {submit.isPending ? "Please wait…" : isLogin ? "Log in" : "Sign up"}
         </Button>
       </form>
-      <p className="mt-6 text-center text-sm text-zinc-400">
+      <p className="mt-8 border-t border-rule pt-5 text-sm text-muted">
         {isLogin ? "No account yet? " : "Already have an account? "}
         <Link
           href={`${isLogin ? "/register" : "/login"}?next=${encodeURIComponent(next)}`}
-          className="text-amber-400 hover:underline"
+          className="text-ink underline decoration-1 underline-offset-4 hover:text-accent"
         >
           {isLogin ? "Sign up" : "Log in"}
         </Link>
       </p>
-    </Card>
+    </div>
   );
 }

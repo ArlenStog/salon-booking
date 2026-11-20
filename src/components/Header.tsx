@@ -5,6 +5,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMe } from "@/hooks/queries";
 import { api } from "@/lib/fetcher";
 
+const navLink = "font-mono text-xs uppercase tracking-[0.16em] text-ink/70 transition-colors hover:text-ink";
+
 export function Header() {
   const { data: me } = useMe();
   const qc = useQueryClient();
@@ -18,30 +20,30 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-10 border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur">
-      <nav className="mx-auto flex max-w-5xl items-center gap-4 px-4 py-3 text-sm sm:gap-5 sm:px-6">
-        <Link href="/" className="mr-auto font-semibold tracking-tight">
-          Fade <span className="text-amber-400">&amp;</span> Co.
+    <header className="border-b border-rule">
+      <nav className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-5 py-5 sm:px-8">
+        <Link href="/" className="mr-auto font-display text-2xl italic leading-none">
+          Fade &amp; Co.
         </Link>
-        <Link href="/book" className="text-zinc-300 hover:text-white">
+        <Link href="/book" className={navLink}>
           Book
         </Link>
         {me && (
-          <Link href="/appointments" className="text-zinc-300 hover:text-white">
+          <Link href="/appointments" className={navLink}>
             My appointments
           </Link>
         )}
         {me?.role === "admin" && (
-          <Link href="/admin" className="text-zinc-300 hover:text-white">
+          <Link href="/admin" className={navLink}>
             Admin
           </Link>
         )}
         {me ? (
-          <button onClick={logout} className="text-zinc-400 hover:text-white">
+          <button onClick={logout} className={navLink}>
             Log out
           </button>
         ) : (
-          <Link href="/login" className="rounded-lg border border-zinc-700 px-3 py-1.5 hover:border-zinc-500">
+          <Link href="/login" className={`${navLink} border-b border-ink pb-0.5 text-ink`}>
             Log in
           </Link>
         )}

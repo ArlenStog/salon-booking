@@ -10,37 +10,48 @@ export function AdminDay() {
   const booked = data?.filter((a) => a.status === "booked") ?? [];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-3xl font-semibold tracking-tight">Schedule</h1>
+    <div className="space-y-10">
+      <header className="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p className="eyebrow">Front desk</p>
+          <h1 className="mt-3 font-display text-5xl">Schedule</h1>
+        </div>
         <input
           type="date"
           aria-label="Date"
           value={date}
           onChange={(e) => e.target.value && setDate(e.target.value)}
-          className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2"
+          className="border-0 border-b border-ink/30 bg-transparent px-0 py-2 font-mono text-lg outline-none focus:border-ink"
         />
-      </div>
+      </header>
       {isPending ? (
-        <p className="text-zinc-500">Loading…</p>
+        <p className="eyebrow">Loading…</p>
       ) : error ? (
         <ErrorText>{error.message}</ErrorText>
       ) : (
-        <>
-          <p className="text-sm text-zinc-400">{booked.length} booked</p>
-          <ul className="divide-y divide-zinc-800 rounded-xl border border-zinc-800">
-            {data.length === 0 && <li className="px-4 py-6 text-zinc-500">No appointments.</li>}
+        <section>
+          <div className="flex items-baseline justify-between border-b border-ink pb-2">
+            <span className="eyebrow text-ink">Time</span>
+            <span className="eyebrow">{booked.length} booked</span>
+          </div>
+          <ul>
+            {data.length === 0 && <li className="py-6 text-muted">No appointments.</li>}
             {data.map((a) => (
-              <li key={a.id} className={`flex gap-4 px-4 py-3 ${a.status === "cancelled" ? "opacity-40 line-through" : ""}`}>
-                <span className="w-28 font-mono text-amber-400">
+              <li
+                key={a.id}
+                className={`grid grid-cols-[7.5rem_1fr_auto] items-baseline gap-4 border-b border-rule py-4 ${
+                  a.status === "cancelled" ? "text-muted line-through" : ""
+                }`}
+              >
+                <span className="font-mono text-sm">
                   {formatSalonTime(a.startsAt)}–{formatSalonTime(a.endsAt)}
                 </span>
-                <span className="flex-1">{a.serviceName}</span>
-                <span className="text-zinc-400">{a.customerName}</span>
+                <span className="font-display text-lg">{a.serviceName}</span>
+                <span className="text-sm">{a.customerName}</span>
               </li>
             ))}
           </ul>
-        </>
+        </section>
       )}
     </div>
   );

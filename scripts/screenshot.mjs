@@ -26,7 +26,7 @@ const times = page.getByRole("group", { name: "Available times" }).getByRole("bu
 await times.nth(5).click();
 await page.mouse.move(0, 0);
 await page.waitForTimeout(500); // let CSS transitions finish
-await page.screenshot({ path: "docs/screenshot.png" });
+await page.screenshot({ path: "docs/screenshot.png", fullPage: true });
 
 await page.goto(`${base}/`);
 await page.screenshot({ path: "docs/home.png" });

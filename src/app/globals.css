@@ -1,15 +1,51 @@
 @import "tailwindcss";
 
+/*
+ * Visual language: a printed barbershop menu.
+ * Warm paper, black ink, one oxblood accent, hairline rules, square corners.
+ */
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: #f3efe7;
+  --color-paper-deep: #e9e3d8;
+  --color-ink: #161412;
+  --color-muted: #6e675d;
+  --color-rule: #d6cfc2;
+  --color-accent: #8c2a1c;
+
+  --font-display: var(--font-bodoni);
+  --font-sans: var(--font-instrument);
+  --font-mono: var(--font-plex-mono);
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
-  background: #09090b;
-  color: #f4f4f5;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+::selection {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+/* Small uppercase labels used across the site, like a menu's section heads. */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* Dotted leader between a menu item and its price. */
+.leader {
+  flex: 1;
+  min-width: 1.5rem;
+  margin: 0 0.75rem;
+  border-bottom: 1px dotted currentColor;
+  opacity: 0.45;
+  transform: translateY(-0.3em);
 }

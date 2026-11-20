@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useAiSuggest, useBook, useServices, useSlots } from "@/hooks/queries";
 import { formatSalonDate, formatSalonTime, salonDateString } from "@/lib/time";
-import { Button, Card, ErrorText } from "./ui";
+import { Button, ErrorText, Panel, StepHeading } from "./ui";
 
 export function BookingFlow({ aiEnabled }: { aiEnabled: boolean }) {
   const today = salonDateString(new Date());
@@ -41,106 +41,125 @@ export function BookingFlow({ aiEnabled }: { aiEnabled: boolean }) {
 
   if (book.isSuccess && selectedService && slot) {
     return (
-      <Card className="mx-auto max-w-md text-center">
-        <p className="text-4xl">✂️</p>
-        <h1 className="mt-3 text-2xl font-semibold">You’re booked!</h1>
-        <p className="mt-2 text-zinc-400" data-testid="confirmation">
+      <div className="mx-auto max-w-xl py-10 text-center">
+        <p className="eyebrow">Confirmed</p>
+        <h1 className="mt-4 font-display text-5xl">You’re booked.</h1>
+        <p className="mt-6 font-mono text-sm" data-testid="confirmation">
           {selectedService.name} · {formatSalonDate(slot)} at {formatSalonTime(slot)}
         </p>
-        <div className="mt-6 flex justify-center gap-3">
-          <Link href="/appointments" className="rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-zinc-950">
+        <div className="mt-10 flex justify-center gap-3">
+          <Link
+            href="/appointments"
+            className="bg-ink px-6 py-3 font-mono text-xs uppercase tracking-[0.16em] text-paper hover:bg-accent"
+          >
             My appointments
           </Link>
           <Button variant="ghost" onClick={() => pick({ serviceId: null })}>
             Book another
           </Button>
         </div>
-      </Card>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-3xl font-semibold tracking-tight">Book an appointment</h1>
+    <div className="space-y-14">
+      <header>
+        <p className="eyebrow">Reservation</p>
+        <h1 className="mt-3 font-display text-5xl">Book a chair</h1>
+      </header>
 
-      <Card className="border-amber-400/30 bg-amber-400/5">
-        <form onSubmit={askAi} className="space-y-3">
-          <label htmlFor="ai" className="flex items-center gap-2 text-sm font-medium text-amber-300">
-            <span aria-hidden>✨</span> Describe what you want
+      <Panel className="bg-paper-deep/60">
+        <form onSubmit={askAi}>
+          <label htmlFor="ai" className="eyebrow block text-ink">
+            Describe what you want
           </label>
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end">
             <input
               id="ai"
               value={aiText}
               onChange={(e) => setAiText(e.target.value)}
               disabled={!aiEnabled}
-              placeholder="e.g. haircut and beard next friday after 2pm"
-              className="flex-1 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 outline-none focus:border-amber-400 disabled:opacity-50"
+              placeholder="haircut and beard next friday after 2pm"
+              className="flex-1 border-0 border-b border-ink/30 bg-transparent px-0 py-2 font-display text-xl italic outline-none placeholder:text-muted/50 focus:border-ink disabled:opacity-50"
             />
             <Button type="submit" disabled={!aiEnabled || ai.isPending || aiText.trim().length < 3}>
               {ai.isPending ? "Thinking…" : "Find a time"}
             </Button>
           </div>
-          {!aiEnabled && <p className="text-xs text-zinc-500">AI booking is off on this deployment (no API key).</p>}
+          {!aiEnabled && (
+            <p className="mt-3 text-xs text-muted">Booking by sentence is switched off on this deployment.</p>
+          )}
           {ai.data && (
-            <p className="text-sm text-zinc-300" data-testid="ai-reply">
+            <p className="mt-4 text-sm" data-testid="ai-reply">
               {ai.data.reply}
             </p>
           )}
-          <ErrorText>{ai.error?.message}</ErrorText>
+          <div className="mt-3">
+            <ErrorText>{ai.error?.message}</ErrorText>
+          </div>
         </form>
-      </Card>
+      </Panel>
 
-      <section className="space-y-3">
-        <h2 className="text-sm font-medium uppercase tracking-wider text-zinc-500">1 · Service</h2>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {services.data?.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => pick({ serviceId: s.id })}
-              aria-pressed={s.id === serviceId}
-              className={`rounded-xl border p-4 text-left transition ${
-                s.id === serviceId ? "border-amber-400 bg-amber-400/10" : "border-zinc-800 hover:border-zinc-600"
-              }`}
-            >
-              <div className="flex justify-between gap-2">
-                <span className="font-medium">{s.name}</span>
-                <span className="font-mono text-sm text-amber-400">{s.priceRsd} RSD</span>
-              </div>
-              <span className="text-xs text-zinc-500">{s.durationMin} min</span>
-            </button>
-          ))}
-        </div>
+      <section className="space-y-2">
+        <StepHeading n="01">Service</StepHeading>
+        <ul>
+          {services.data?.map((s) => {
+            const on = s.id === serviceId;
+            return (
+              <li key={s.id}>
+                <button
+                  onClick={() => pick({ serviceId: s.id })}
+                  aria-pressed={on}
+                  className={`flex w-full items-baseline border-b border-rule px-3 py-4 text-left transition-colors ${
+                    on ? "bg-ink text-paper" : "hover:bg-paper-deep"
+                  }`}
+                >
+                  <span className="font-display text-xl">{s.name}</span>
+                  <span className="leader" aria-hidden />
+                  <span className="font-mono">{s.priceRsd} RSD</span>
+                  <span className={`ml-4 w-14 text-right font-mono text-xs ${on ? "text-paper/70" : "text-muted"}`}>
+                    {s.durationMin} min
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
       </section>
 
-      <section className="space-y-3">
-        <h2 className="text-sm font-medium uppercase tracking-wider text-zinc-500">2 · Day</h2>
+      <section className="space-y-5">
+        <StepHeading n="02">Day</StepHeading>
         <input
           type="date"
           aria-label="Date"
           value={date}
           min={today}
           onChange={(e) => e.target.value && pick({ date: e.target.value })}
-          className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 outline-none focus:border-amber-400"
+          className="border-0 border-b border-ink/30 bg-transparent px-0 py-2 font-mono text-lg outline-none focus:border-ink"
         />
       </section>
 
-      <section className="space-y-3">
-        <h2 className="text-sm font-medium uppercase tracking-wider text-zinc-500">3 · Time</h2>
+      <section className="space-y-5">
+        <StepHeading n="03">Time</StepHeading>
         {serviceId === null ? (
-          <p className="text-sm text-zinc-500">Choose a service first.</p>
+          <p className="text-sm text-muted">Choose a service first.</p>
         ) : slots.isPending ? (
-          <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
+          <div className="grid grid-cols-4 border-l border-t border-rule sm:grid-cols-8">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-10 animate-pulse rounded-lg bg-zinc-800/60" />
+              <div key={i} className="h-12 animate-pulse border-b border-r border-rule bg-paper-deep" />
             ))}
           </div>
         ) : slots.isError ? (
           <ErrorText>{slots.error.message}</ErrorText>
         ) : slots.data.length === 0 ? (
-          <p className="text-sm text-zinc-500">No free times this day — we may be closed or fully booked.</p>
+          <p className="text-sm text-muted">No free times this day — we may be closed or fully booked.</p>
         ) : (
-          <div className="grid grid-cols-4 gap-2 sm:grid-cols-8" role="group" aria-label="Available times">
+          <div
+            className="grid grid-cols-4 border-l border-t border-rule sm:grid-cols-8"
+            role="group"
+            aria-label="Available times"
+          >
             {slots.data.map((iso) => {
               const selected = iso === slot;
               const suggested = aiSlots.includes(iso);
@@ -149,15 +168,14 @@ export function BookingFlow({ aiEnabled }: { aiEnabled: boolean }) {
                   key={iso}
                   onClick={() => setSlot(iso)}
                   aria-pressed={selected}
-                  className={`rounded-lg border py-2 font-mono text-sm transition ${
-                    selected
-                      ? "border-amber-400 bg-amber-400 text-zinc-950"
-                      : suggested
-                        ? "border-amber-400/60 text-amber-300"
-                        : "border-zinc-800 hover:border-zinc-600"
-                  }`}
+                  className={`relative h-12 border-b border-r border-rule font-mono text-sm transition-colors ${
+                    selected ? "bg-ink text-paper" : "bg-paper hover:bg-paper-deep"
+                  } ${suggested && !selected ? "text-accent" : ""}`}
                 >
                   {formatSalonTime(iso)}
+                  {suggested && (
+                    <span aria-hidden className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-accent" />
+                  )}
                 </button>
               );
             })}
@@ -165,11 +183,11 @@ export function BookingFlow({ aiEnabled }: { aiEnabled: boolean }) {
         )}
       </section>
 
-      <div className="flex flex-col gap-3 border-t border-zinc-800 pt-6 sm:flex-row sm:items-center">
-        <p className="flex-1 text-sm text-zinc-400">
+      <div className="flex flex-col gap-4 border-t border-ink pt-6 sm:flex-row sm:items-center">
+        <p className="flex-1 font-mono text-sm">
           {selectedService && slot
             ? `${selectedService.name} · ${formatSalonDate(slot)} at ${formatSalonTime(slot)}`
-            : "Pick a service and a time."}
+            : <span className="text-muted">Pick a service and a time.</span>}
         </p>
         <Button
           disabled={!selectedService || !slot || book.isPending}
